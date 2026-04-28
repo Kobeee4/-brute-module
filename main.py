@@ -1,66 +1,72 @@
 import os
 import sys
-import time
+import random
 from module import UniversalBruter
 
-def menu():
+R = '\033[31m'
+G = '\033[32m'
+Y = '\033[33m'
+B = '\033[34m'
+C = '\033[36m'
+W = '\033[0m'
+
+def banner():
     os.system('clear')
-    print("=" * 45)
-    print("Un-Rooted Alternative To Hydra. ")
-    print("do what ever u want don't blame me tho ") 
-    print(" testing only") 
-    print("=" * 45)
+    colors = [R, G, Y, B, C]
+    clr = random.choice(colors)
     
-    target = input("[?] Target URL: ")
-    user = input("[?] Username: ")
-    u_field = input("[?] User Field Name: ")
-    p_field = input("[?] Pass Field Name: ")
-    fail = input("[?] Failure String: ")
-    w_list = input("[?] Wordlist Path: ")
-    json_mode = input("[?] Use JSON? (y/n): ").lower() == 'y'
-    proxy_file = input("[?] Proxy List Path (Enter to skip): ")
+    print(f"""{clr}
+    
+     █████╗ ██╗     ████████╗███████╗██████╗ ███╗   ██╗ █████╗ ████████╗██╗██╗   ██╗███████╗
+    ██╔══██╗██║     ╚══██╔══╝██╔════╝██╔══██╗████╗  ██║██╔══██╗╚══██╔══╝██║██║   ██║██╔════╝
+    ███████║██║        ██║   █████╗  ██████╔╝██╔██╗ ██║███████║   ██║   ██║██║   ██║█████╗  
+    ██╔══██║██║        ██║   ██╔══╝  ██╔══██╗██║╚██╗██║██╔══██║   ██║   ██║╚██╗ ██╔╝██╔══╝  
+    ██║  ██║███████╗   ██║   ███████╗██║  ██║██║ ╚████║██║  ██║   ██║   ██║ ╚████╔╝ ███████╗
+    ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═══╝  ╚══════╝
+                                                                                    
+    {W}{Y}==============={W} {C}Un-Rooted Alternative To Hydra{W} {Y}================{W}
+    {R}      [!] Warning: testing only | Unauthorized use is prohibited [!]{W}
+    """)
 
-    proxies = []
-    if proxy_file:
-        with open(proxy_file, 'r') as f:
-            proxies = [line.strip() for line in f]
-
+def menu():
+    banner()
+    
+    print(f"{G}[+]{W} Target Settings")
+    target = input(f" └── {Y}URL:{W} ")
+    user = input(f" └── {Y}Username:{W} ")
+    u_field = input(f" └── {Y}User Field:{W} ")
+    p_field = input(f" └── {Y}Pass Field:{W} ")
+    fail = input(f" └── {Y}Failure String:{W} ")
+    
+    print(f"\n{G}[+]{W} Wordlist & Config")
+    w_list = input(f" └── {Y}Path:{W} ")
+    json_mode = input(f" └── {Y}Use JSON? (y/n):{W} ").lower() == 'y'
+    
+    print(f"\n{B}[*]{W} Initializing engine...")
     scanner = UniversalBruter(target, u_field, p_field, user, fail)
     
-    print("\n" + "-" * 45)
-    print(f"[*] Starting Attack on {target}")
-    print("-" * 45 + "\n")
-
     try:
         with open(w_list, 'r', errors='ignore') as f:
             for i, line in enumerate(f):
                 pwd = line.strip()
-                
-                if proxies and i % 5 == 0:
-                    px = random.choice(proxies)
-                    scanner.update_proxy(px)
+                sys.stdout.write(f"\r{C}[*]{W} Attempt {i+1}: {Y}{pwd[:15]}{W}...")
+                sys.stdout.flush()
                 
                 res = scanner.attempt(pwd, use_json=json_mode)
                 
                 if res == "CAPTCHA":
-                    print(f"\n[!] Blocked by CAPTCHA/Bot Detection at: {pwd}")
+                    print(f"\n{R}[!] Blocked by CAPTCHA at: {pwd}{W}")
                     return
-                elif res == "ERROR":
-                    sys.stdout.write(f"\r[!] Connection Error on: {pwd[:10]}...")
                 elif res is True:
-                    print(f"\n\n[+] SUCCESS!")
-                    print(f"[+] Password: {pwd}")
-                    print(f"[+] Found at attempt: {i+1}")
+                    print(f"\n\n{G}[SUCCESS]{W}")
+                    print(f" └── {G}Password Found:{W} {pwd}")
                     return
-                
-                sys.stdout.write(f"\r[*] Attempt {i+1}: {pwd[:15]}...")
-                sys.stdout.flush()
-                
-        print("\n\n[-] Finished: Password not found.")
+        
+        print(f"\n\n{R}[-]{W} Exhausted wordlist. No match.")
     except KeyboardInterrupt:
-        print("\n\n[!] Aborted by user.")
+        print(f"\n\n{R}[!] Aborted.{W}")
     except Exception as e:
-        print(f"\n[ERROR] {e}")
+        print(f"\n{R}[ERROR]{W} {e}")
 
 if __name__ == "__main__":
     menu()
