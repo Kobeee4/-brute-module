@@ -1,2 +1,2 @@
 # -brute-module
-Ai Module tingy
+Ai Module thingy
