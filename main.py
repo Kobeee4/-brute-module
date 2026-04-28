@@ -8,6 +8,7 @@ def menu():
     print("=" * 45)
     print("Un-Rooted Alternative To Hydra. ")
     print("do what ever u want don't blame me tho ") 
+    print(" testing only") 
     print("=" * 45)
     
     target = input("[?] Target URL: ")
